@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 class GuestsRepository(SQLAlchemyAsyncRepository[GuestsModel]):
     model_type = GuestsModel
     
+    
 def limitoffsetpagination(
     current_page: int = Parameter(ge=1, query="currentPage", default=1, required=False),
     page_size: int = Parameter(
@@ -31,8 +32,11 @@ def limitoffsetpagination(
     ),
 ) -> LimitOffset:
     return LimitOffset(page_size, page_size * (current_page - 1))
+
+
 async def guestsrepo(db_session: AsyncSession) -> GuestsRepository:
     return GuestsRepository(session=db_session)
+
 
 async def guestsdetailsrepo(db_session: AsyncSession) -> GuestsRepository:
     return GuestsRepository(
@@ -41,13 +45,14 @@ async def guestsdetailsrepo(db_session: AsyncSession) -> GuestsRepository:
     )  
     
 
-
 class GuestsController(Controller):
     dependencies = {"guests_repo": Provide(guestsrepo)}
     
+    
     @get(path="/")
     async def page(self) -> str:
-        return "Пупупу"  
+        return ""  
+    
     
     @get(path="/guests")
     async def list_guests(
@@ -61,6 +66,7 @@ class GuestsController(Controller):
             limit=limit_offset.limit,
             offset=limit_offset.offset,
         )         
+        
         
     @get(path="/guests/{guests_id:uuid}", dependencies={"guests_repo": Provide(guestsdetailsrepo)})
     async def get_guest(
